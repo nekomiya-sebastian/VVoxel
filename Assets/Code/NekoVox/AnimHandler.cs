@@ -151,7 +151,7 @@ public class AnimHandler
 					startRot = transform.rotation;
 					targetRot = Quaternion.Euler( actions[curAction].targetRot );
 				}
-				moveTimer.SetDuration(actions[curAction].moveDur );
+				moveTimer.SetDuration( actions[curAction].moveDur );
 				moveTimer.Reset();
 			}
 
@@ -171,7 +171,7 @@ public class AnimHandler
 		animTimer.Reset();
 		doneAnim = false;
 	}
-
+	
 	IEnumerator MaybeSetNoneTimer( int actionOffset = 0 )
 	{
 		yield return( new WaitForEndOfFrame() );
