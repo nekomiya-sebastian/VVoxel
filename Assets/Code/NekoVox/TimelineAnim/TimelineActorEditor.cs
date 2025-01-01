@@ -10,6 +10,8 @@ public class TimelineActorEditor
 {
 	public override void OnInspectorGUI()
 	{
+		if( Application.isPlaying ) return;
+
 		var timelineActor = ( TimelineActor )target;
 
 		if( timelineActor.keyframes.Count < 1 ) timelineActor.keyframes.Add( new TimelineKeyframe() );
@@ -36,9 +38,13 @@ public class TimelineActorEditor
 			else timelineActor.keyframes[timelineActor.TimelineFrame].Set( timelineActor.viewKeyframe );
 		}
 
+		bool prevAutoWrite = timelineActor.AutoWriteFrame;
 		timelineActor.AutoWriteFrame = GUILayout.Toggle( timelineActor.AutoWriteFrame,"Auto Write Frame" );
+		if( !prevAutoWrite && timelineActor.AutoWriteFrame ) timelineActor.WriteFrame();
 
+		bool prevAutoRead = timelineActor.AutoReadFrame;
 		timelineActor.AutoReadFrame = GUILayout.Toggle( timelineActor.AutoReadFrame,"Auto Read Frame" );
+		if( !prevAutoRead && timelineActor.AutoReadFrame ) timelineActor.LoadFrame();
 		
 		if( GUILayout.Button( "Add Frame" ) )
 		{
@@ -60,15 +66,17 @@ public class TimelineActorEditor
 		if( GUILayout.Button( "Reset Frame" ) ) timelineActor.LoadFrame();
 		GUILayout.EndHorizontal();
 
-		// removed cuz this is too dangerous, if you click you can't undo
-		// if( GUILayout.Button( "Remove All Frames" ) )
-		// {
-		// 	timelineActor.TimelineFrame = 0;
-		// 	timelineActor.viewKeyframe = new TimelineKeyframe();
-		// 	timelineActor.keyframes.Clear();
-		// 	timelineActor.keyframes.Add( new TimelineKeyframe() );
-		// }
+		canRemove = GUILayout.Toggle( canRemove,"Remove All Frames Safety Switch" );
+		if( canRemove && GUILayout.Button( "Remove All Frames" ) )
+		{
+			timelineActor.TimelineFrame = 0;
+			timelineActor.viewKeyframe = new TimelineKeyframe();
+			timelineActor.keyframes.Clear();
+			timelineActor.keyframes.Add( new TimelineKeyframe() );
+		}
 
 		DrawDefaultInspector();
 	}
+
+	bool canRemove = false;
 }

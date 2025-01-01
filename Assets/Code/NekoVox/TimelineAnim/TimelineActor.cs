@@ -187,18 +187,31 @@ public class TimelineActor
 		if( TimelineFrame > keyframes.Count - 1 ) TimelineFrame = keyframes.Count - 1;
 	}
 
-	public int TimelineFrame { get; set; }
-	public bool AutoReadFrame { get; set; }
-	public bool AutoWriteFrame { get; set; }
+	public int TimelineFrame
+	{
+		get { return( curFrame ); }
+		set { curFrame = value; }
+	}
+	public bool AutoReadFrame
+	{
+		get { return( autoRead ); }
+		set { autoRead = value; }
+	}
+	public bool AutoWriteFrame
+	{
+		get { return( autoWrite ); }
+		set { autoWrite = value; }
+	}
 
 	[SerializeField] public TimelineKeyframe viewKeyframe = new TimelineKeyframe();
 
-	[Header( "Raw keyframes" )]
-	[SerializeField] public List<TimelineKeyframe> keyframes = new List<TimelineKeyframe>();
+	[HideInInspector] [SerializeField] public List<TimelineKeyframe> keyframes = new List<TimelineKeyframe>();
 
 	Animator animCtrl;
 
-	int curFrame;
+	[HideInInspector] [SerializeField] int curFrame = 0;
+	[HideInInspector] [SerializeField] bool autoRead = false;
+	[HideInInspector] [SerializeField] bool autoWrite = false;
 
 	Timer animTimer = new Timer( 0.0f );
 	Timer moveTimer = new Timer( 0.0f );
