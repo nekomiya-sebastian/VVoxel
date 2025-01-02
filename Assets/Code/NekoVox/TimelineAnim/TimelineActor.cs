@@ -164,6 +164,51 @@ public class TimelineActor
 		return( clipInfo.clip.length );
 	}
 
+	public void AddFrame( TimelineActorEditor.AddFrameBehavior behavior )
+	{
+		int dupeFrame = -1;
+		bool dupe = false;
+		var targetPos = Vector3.zero;
+		var targetRot = Vector3.zero;
+		switch( behavior )
+		{
+			case TimelineActorEditor.AddFrameBehavior.DuplicateLatest:
+				dupeFrame = keyframes.Count - 1;
+				dupe = true;
+				break;
+			case TimelineActorEditor.AddFrameBehavior.DuplicateCurrent:
+				dupeFrame = curFrame;
+				dupe = true;
+				break;
+			case TimelineActorEditor.AddFrameBehavior.UseTransform:
+				targetPos = transform.position;
+				targetRot = transform.eulerAngles;
+				dupe = false;
+				break;
+			case TimelineActorEditor.AddFrameBehavior.Blank:
+				dupe = false;
+				break;
+		}
+
+		if( keyframes.Count < 1 ) dupe = false;
+		else if( dupeFrame > -1 )
+		{
+			targetPos = keyframes[dupeFrame].targetPos;
+			targetRot = keyframes[dupeFrame].targetRot;
+		}
+
+		var frame = ( dupe
+			? keyframes[dupeFrame].DuplicateKeyframe()
+			: new TimelineKeyframe() );
+
+		frame.targetPos = targetPos;
+		frame.targetRot = targetRot;
+
+		keyframes.Add( frame );
+		TimelineFrame = keyframes.Count - 1;
+		viewKeyframe.Set( frame );
+	}
+
 	public void WriteFrame()
 	{
 		viewKeyframe.targetPos = transform.position;
@@ -174,7 +219,13 @@ public class TimelineActor
 		keyframes[TimelineFrame].Set( viewKeyframe );
 	}
 
-	public void LoadFrame()
+	public void LoadFromSrcFrame()
+	{
+		transform.position = keyframes[TimelineFrame].targetPos;
+		transform.eulerAngles = keyframes[TimelineFrame].targetRot;
+	}
+
+	public void LoadFromViewFrame()
 	{
 		transform.position = viewKeyframe.targetPos;
 		transform.eulerAngles = viewKeyframe.targetRot;
@@ -190,7 +241,12 @@ public class TimelineActor
 	public int TimelineFrame
 	{
 		get { return( curFrame ); }
-		set { curFrame = value; }
+		set
+		{
+			curFrame = value;
+			if( curFrame < 0 ) curFrame = 0;
+			else if( curFrame > keyframes.Count - 1 ) curFrame = keyframes.Count - 1;
+		}
 	}
 	public bool AutoReadFrame
 	{
@@ -202,6 +258,16 @@ public class TimelineActor
 		get { return( autoWrite ); }
 		set { autoWrite = value; }
 	}
+	public bool AutoSyncAll
+	{
+		get { return( autoSync ); }
+		set { autoSync = value; }
+	}
+	public TimelineActorEditor.SyncBehavior SyncBehavior
+	{
+		get { return( syncBehavior ); }
+		set { syncBehavior = value; }
+	}
 
 	[SerializeField] public TimelineKeyframe viewKeyframe = new TimelineKeyframe();
 
@@ -212,6 +278,8 @@ public class TimelineActor
 	[HideInInspector] [SerializeField] int curFrame = 0;
 	[HideInInspector] [SerializeField] bool autoRead = false;
 	[HideInInspector] [SerializeField] bool autoWrite = false;
+	[HideInInspector] [SerializeField] bool autoSync = false;
+	[HideInInspector] [SerializeField] TimelineActorEditor.SyncBehavior syncBehavior = TimelineActorEditor.SyncBehavior.ScrollToLatest;
 
 	Timer animTimer = new Timer( 0.0f );
 	Timer moveTimer = new Timer( 0.0f );
