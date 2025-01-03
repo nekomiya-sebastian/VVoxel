@@ -21,13 +21,16 @@ public class TimelineActor
 		{
 			var frame = keyframes[i];
 
-			finalState = frame.anim;
-			if( frame.anim != TimelineKeyframe.AnimState.None ) lastValidState = frame.anim;
+			if( !frame.emptyKeyframe )
+			{
+				finalState = frame.anim;
+				if( frame.anim != TimelineKeyframe.AnimState.None ) lastValidState = frame.anim;
 
-			finalPos = frame.targetPos;
-			finalRot = frame.targetRot;
+				finalPos = frame.targetPos;
+				finalRot = frame.targetRot;
 
-			foreach( var triggerObj in frame.triggerObjs ) triggerObj.GetComponent<AnimTriggerBase>().PerformAction();
+				foreach( var triggerObj in frame.triggerObjs ) triggerObj.GetComponent<AnimTriggerBase>().PerformAction();
+			}
 		}
 		
 		if( finalState != TimelineKeyframe.AnimState.None ) animCtrl.SetInteger( "State",( int )finalState );
@@ -167,37 +170,40 @@ public class TimelineActor
 	public void AddFrame( TimelineActorEditor.AddFrameBehavior behavior )
 	{
 		int dupeFrame = -1;
-		bool dupe = false;
 		var targetPos = Vector3.zero;
 		var targetRot = Vector3.zero;
 		switch( behavior )
 		{
 			case TimelineActorEditor.AddFrameBehavior.DuplicateLatest:
-				dupeFrame = keyframes.Count - 1;
-				dupe = true;
+				for( int i = keyframes.Count - 1; i <= 0; --i )
+				{
+					if( !keyframes[i].emptyKeyframe )
+					{
+						dupeFrame = i;
+						i = -1;
+					}
+				}
 				break;
 			case TimelineActorEditor.AddFrameBehavior.DuplicateCurrent:
 				dupeFrame = curFrame;
-				dupe = true;
 				break;
 			case TimelineActorEditor.AddFrameBehavior.UseTransform:
 				targetPos = transform.position;
 				targetRot = transform.eulerAngles;
-				dupe = false;
 				break;
 			case TimelineActorEditor.AddFrameBehavior.Blank:
-				dupe = false;
+			default:
+				// do nothing
 				break;
 		}
 
-		if( keyframes.Count < 1 ) dupe = false;
-		else if( dupeFrame > -1 )
+		if( dupeFrame > -1 )
 		{
 			targetPos = keyframes[dupeFrame].targetPos;
 			targetRot = keyframes[dupeFrame].targetRot;
 		}
 
-		var frame = ( dupe
+		var frame = ( ( dupeFrame > -1 )
 			? keyframes[dupeFrame].DuplicateKeyframe()
 			: new TimelineKeyframe() );
 
@@ -221,14 +227,20 @@ public class TimelineActor
 
 	public void LoadFromSrcFrame()
 	{
-		transform.position = keyframes[TimelineFrame].targetPos;
-		transform.eulerAngles = keyframes[TimelineFrame].targetRot;
+		if( !keyframes[TimelineFrame].emptyKeyframe )
+		{
+			transform.position = keyframes[TimelineFrame].targetPos;
+			transform.eulerAngles = keyframes[TimelineFrame].targetRot;
+		}
 	}
 
 	public void LoadFromViewFrame()
 	{
-		transform.position = viewKeyframe.targetPos;
-		transform.eulerAngles = viewKeyframe.targetRot;
+		if( !viewKeyframe.emptyKeyframe )
+		{
+			transform.position = viewKeyframe.targetPos;
+			transform.eulerAngles = viewKeyframe.targetRot;
+		}
 	}
 
 	public void ScrollFrame( int dir )
