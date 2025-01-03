@@ -175,7 +175,7 @@ public class TimelineActor
 		switch( behavior )
 		{
 			case TimelineActorEditor.AddFrameBehavior.DuplicateLatest:
-				for( int i = keyframes.Count - 1; i <= 0; --i )
+				for( int i = keyframes.Count - 1; i >= 0; --i )
 				{
 					if( !keyframes[i].emptyKeyframe )
 					{
