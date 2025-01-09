@@ -20,7 +20,7 @@ public class CustomizePanel
 		transform.Find( "TitleText" ).GetComponent<TMP_Text>().text = title;
 
 		{
-			var modelPanel = transform.Find( "ModelPanel" ).Find( "Viewport" ).Find( "Content" );
+			var modelPanel = transform.Find( "CenterPanel" ).Find( "ModelPanel" ).Find( "Viewport" ).Find( "Content" );
 			// var modelChildCount = modelPanel.transform.childCount;
 			// Assert.IsTrue( modelChildCount >= models.Count );
 			// // cull empty buttons
@@ -51,7 +51,7 @@ public class CustomizePanel
 		}
 
 		{
-			var colorPanel = transform.Find( "ColorPanel" ).Find( "Viewport" ).Find( "Content" );
+			var colorPanel = transform.Find( "CenterPanel" ).Find( "ColorPanel" ).Find( "Viewport" ).Find( "Content" );
 
 			for( int i = 0; i < mats.Count; ++i )
 			{
@@ -101,8 +101,8 @@ public class CustomizePanel
 		}
 
 		// maintain scroll position from prev panel
-		var modelPanelScrollRect = transform.Find( "ModelPanel" ).GetComponent<ScrollRect>();
-		var colorPanelScrollRect = transform.Find( "ColorPanel" ).GetComponent<ScrollRect>();
+		var modelPanelScrollRect = transform.Find( "CenterPanel" ).Find( "ModelPanel" ).GetComponent<ScrollRect>();
+		var colorPanelScrollRect = transform.Find( "CenterPanel" ).Find( "ColorPanel" ).GetComponent<ScrollRect>();
 		modelPanelScrollRect.verticalNormalizedPosition = modelScroll;
 		colorPanelScrollRect.verticalNormalizedPosition = colorScroll;
 		modelPanelScrollRect.onValueChanged.AddListener( OnModelScroll );
