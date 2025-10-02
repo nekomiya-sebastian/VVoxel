@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 public class PartsPanel
@@ -28,9 +29,9 @@ public class PartsPanel
 
 	void Start()
 	{
-		charCtrl = charModel.GetComponent<CustomCharCtrl>();
-
 		var partsPanel = transform.Find( "Viewport" ).Find( "Content" );
+
+		VerifyPartMeshReadability();
 
 		for( int i = 0; i < parts.Count; ++i )
 		{
@@ -46,8 +47,10 @@ public class PartsPanel
 
 		Destroy( curCustomizePanel );
 
-		curCustomizePanel = Instantiate( parts[index].panelPrefab,canv.transform );
+		// curCustomizePanel = Instantiate( parts[index].panelPrefab,canv.transform );
+		curCustomizePanel = Instantiate( customizationPanelPrefab,canv.transform );
 		customizePanel = curCustomizePanel.GetComponent<CustomizePanel>();
+		parts[index].panelPrefab.GetComponent<CustomizePanel>().CopyInto( customizePanel );
 		customizePanel.SetCharModel( charModel );
 		customizePanel.SetPartsPanel( this );
 		customizePanel.SetCharCtrl( charCtrl );
@@ -76,9 +79,9 @@ public class PartsPanel
 
 	void SetCharTransform( Vector3 pos,Vector3 rot,float scale )
 	{
-		charModel.transform.localScale = Vector3.one * scale;
-		charModel.transform.eulerAngles = rot;
-		charModel.transform.position = pos;
+		charCtrl.transform.localScale = Vector3.one * scale;
+		charCtrl.transform.eulerAngles = rot;
+		charCtrl.transform.position = pos;
 	}
 
 	public void ResetZoom()
@@ -133,15 +136,44 @@ public class PartsPanel
 		return( parts );
 	}
 
+	public void VerifyPartMeshReadability()
+	{
+		// verify that all models are read/write enabled (mostly for when we add new models &
+		//  inevitably forget about doing this)
+		// this only matters if we export the project
+		// #if UNITY_EDITOR
+		// bool foundInvalidMesh = false;
+		// foreach( var part in parts )
+		// {
+		// 	var models = part.panelPrefab.GetComponent<CustomizePanel>().GetModels();
+		// 	foreach( var model in models )
+		// 	{
+		// 		if( !model.transform.GetChild( 0 ).GetComponent<MeshFilter>().sharedMesh.isReadable )
+		// 		{
+		// 			foundInvalidMesh = true;
+		// 			Debug.LogError( "Mesh must be marked as Read/Write in the import settings - " + model.name );
+		// 		}
+		// 	}
+		// }
+		// if( foundInvalidMesh )
+		// {
+		// 	Assert.IsTrue( false,
+		// 		"Meshes must be marked as Read/Write enabled in import settings or else it causes build errors" );
+		// }
+		// #endif
+	}
+
 	GameObject curCustomizePanel = null;
 	CustomizePanel customizePanel = null;
-	CustomCharCtrl charCtrl;
+	[SerializeField] CustomCharCtrl charCtrl;
 
 	[SerializeField] GameObject charModel = null;
 	[SerializeField] Canvas canv = null;
 	[SerializeField] Toggle movePartToggle = null;
 
 	[SerializeField] GameObject partButtonPrefab = null;
+
+	[SerializeField] GameObject customizationPanelPrefab = null;
 
 	[SerializeField] List<Part> parts = new List<Part>();
 

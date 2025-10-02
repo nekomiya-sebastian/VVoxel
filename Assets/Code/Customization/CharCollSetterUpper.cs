@@ -9,7 +9,12 @@ public class CharCollSetterUpper
 {
 	void Start()
 	{
-		CheckChildren( transform,true );
+		self = this;
+	}
+
+	public static void SetupColls()
+	{
+		if( self ) self.CheckChildren( self.transform,true );
 	}
 
 	void CheckChildren( Transform start,bool first )
@@ -31,9 +36,12 @@ public class CharCollSetterUpper
 		else if( !contains && !first )
 		{
 			var meshColl = start.gameObject.AddComponent<MeshCollider>();
+			if( start.Find( "default" ) == null ) print( "can't find default for " + start.name );
 			meshColl.sharedMesh = start.Find( "default" ).GetComponent<MeshFilter>().mesh;
 		}
 	}
+
+	static CharCollSetterUpper self = null;
 
 	string latest = "";
 }

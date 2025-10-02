@@ -1002,7 +1002,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nonePrefab: {fileID: 5277171027748074758, guid: 27a8fefc44a16c14a982ae61052cdf01, type: 3}
-  title: Glasses
+  title: Face Deco
   pivotPath:
   - TorsoLowerPivot
   - TorsoUpperPivot

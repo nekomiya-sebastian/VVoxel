@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
-using UnityEditor;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -40,16 +39,44 @@ public class SaveLoadHandler
 
 	void Start()
 	{
-		defaultNekoPath = Application.streamingAssetsPath + "/" + "NekomiyaSebastian.vvox";
-		customPath = Application.streamingAssetsPath + "/" + "MyCharacter.vvox";
+		self = this;
 
-		LoadFromPath( File.Exists( customPath ) ? customPath : defaultNekoPath );
+		SetupParts( partsPanel.GetParts() );
+
+		defaultNekoPath = Application.streamingAssetsPath + "/" + "NekomiyaSebastian.vvox";
+
+		if( customPaths.Length > 0 ) {}
+		else if( loadOnStart )
+		{
+			customPath = Application.streamingAssetsPath + "/" + customCharName;
+
+			LoadFromPath( File.Exists( customPath ) ? customPath : defaultNekoPath );
+		}
 	}
 
 	void Update()
 	{
-		if( Input.GetKey( KeyCode.LeftControl ) && Input.GetKeyDown( KeyCode.S ) ) Save();
-		if( Input.GetKey( KeyCode.LeftControl ) && Input.GetKeyDown( KeyCode.R ) ) LoadDefault();
+		if( enableHotkeys )
+		{
+			if( Input.GetKey( KeyCode.LeftControl ) && Input.GetKeyDown( KeyCode.S ) ) Save();
+			if( Input.GetKey( KeyCode.LeftControl ) && Input.GetKeyDown( KeyCode.R ) ) LoadDefault();
+		}
+
+		if( unloadedMats < 1 )
+		{
+			if( curCustomLoad < customModels.Length ) // load next in the list
+			{
+				charModel = customModels[curCustomLoad];
+				var curModelPath = Application.streamingAssetsPath + "/" + customPaths[curCustomLoad] + ".vvox";
+				LoadFromPath( File.Exists( curModelPath ) ? curModelPath : defaultNekoPath );
+				++curCustomLoad;
+			}
+			else if( !setupColls )
+			{
+				setupColls = true;
+				CharCollSetterUpper.SetupColls();
+			}
+		}
 	}
 
 	public void Save()
@@ -58,13 +85,22 @@ public class SaveLoadHandler
 		// 
 		// if( path.Length > 0 ) // 0 len path = cancelled
 		{
-			var path = Application.streamingAssetsPath + "/" + "MyCharacter.vvox";
-			var writer = new StreamWriter( path );
-			foreach( var part in partOrder )
+			string[] paths = new string[]
 			{
-				writer.WriteLine( parts[part].GenerateLine() );
+				Application.streamingAssetsPath + "/" + customCharName,
+				#if !UNITY_EDITOR
+				Application.persistentDataPath + "/" + customCharName
+				#endif
+			};
+			foreach( var path in paths )
+			{
+				var writer = new StreamWriter( path );
+				foreach( var part in partOrder )
+				{
+					writer.WriteLine( parts[part].GenerateLine() );
+				}
+				writer.Close();
 			}
-			writer.Close();
 		}
 	}
 
@@ -74,15 +110,24 @@ public class SaveLoadHandler
 		// if( path.Length > 0 ) LoadFromPath( path );
 	}
 
+	public static void StaticSave()
+	{
+		Assert.IsNotNull( self );
+		self.Save();
+	}
+
 	// load default nekomiya sebastian model
 	// todo: menu to pick from lots of default models
 	public void LoadDefault()
 	{
+		partsPanel.Deselect();
 		LoadFromPath( defaultNekoPath );
 	}
 
-	void LoadFromPath( string path )
+	public void LoadFromPath( string path,bool isCostume = false )
 	{
+		setupColls = false;
+
 		var reader = new StreamReader( path );
 		var lines = new List<string>();
 		while( !reader.EndOfStream ) lines.Add( reader.ReadLine() );
@@ -103,10 +148,16 @@ public class SaveLoadHandler
 		}
 		for( int i = 0; i < panelParts.Count; ++i )
 		{
+			if( isCostume && ( costumePartsPreserveInds.Contains( i ) || data[i].model == -1 ) ) continue;
+
 			var customizePanel = panelParts[i].panelPrefab.GetComponent<CustomizePanel>();
-			customizePanel.ReplaceModel( data[i].model,data[i].offset,data[i].rot,charModel,false );
-			// model has to load in b4 setting mat
-			if( data[i].color > -1 ) StartCoroutine( SetModelMat( customizePanel,data[i].color ) );
+			customizePanel.ReplaceModel( data[i].model,data[i].offset,data[i].rot,charModel,false,false );
+			if( data[i].color > -1 )
+			{
+				++unloadedMats;
+				// model has to load in b4 setting mat
+				StartCoroutine( SetModelMat( customizePanel,data[i].color ) );
+			}
 
 			parts[panelParts[i].pivotName] = data[i];
 		}
@@ -117,10 +168,14 @@ public class SaveLoadHandler
 		yield return( new WaitForEndOfFrame() );
 		
 		customizePanel.ReplaceModelMat( color,charModel,false );
+		--unloadedMats;
 	}
 
 	public static void SetupParts( List<PartsPanel.Part> partsList )
 	{
+		if( setupParts ) return;
+		setupParts = true;
+
 		foreach( var part in partsList )
 		{
 			partOrder.Add( part.pivotName );
@@ -153,12 +208,46 @@ public class SaveLoadHandler
 		parts[pivotName].rot = rot;
 	}
 
+	public static bool DoneLoading()
+	{
+		return( self.unloadedMats < 1 && self.curCustomLoad >= self.customModels.Length );
+	}
+
+	static SaveLoadHandler self;
+
 	[SerializeField] PartsPanel partsPanel = null;
 	[SerializeField] GameObject charModel = null;
+
+	[SerializeField] bool enableHotkeys = true;
+
+	[SerializeField] string[] customPaths = null;
+	[SerializeField] GameObject[] customModels = null;
 
 	static List<string> partOrder = new List<string>();
 	static Dictionary<string,PartSaveInfo> parts = new Dictionary<string,PartSaveInfo>();
 	static string pivotName = ""; // cur pivot that update funcs will affect
 	string defaultNekoPath;
 	string customPath;
+
+	static bool setupParts = false;
+
+	int curCustomLoad = 0;
+	int unloadedMats = 0;
+	bool setupColls = false;
+
+	public static readonly string customCharName = "MyCharacter.vvox";
+	
+	[SerializeField] bool loadOnStart = true;
+
+	// indices of parts that will not be replaced by costumes
+	static readonly int[] costumePartsPreserveInds =
+	{
+		0, // head
+		1,2,3,4,5,6, // eyes & eyebrows
+		// 7 is glasses, which some costumes might want to use
+		8,9,10,11,12,13, // hair
+		// 14,15,16,17, // mimi - these will be replaced, but only by some outfits
+		19 // neck
+		// everything else can be replaced by the costume parts
+	};
 }

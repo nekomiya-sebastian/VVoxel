@@ -316,11 +316,15 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: c5a4197550ec7e94ab01483b40f433b4, type: 3}
   - {fileID: 919132149155446097, guid: c493e622ecb0b314985ad334204b9bb9, type: 3}
   - {fileID: 919132149155446097, guid: 63e027ecb00a85448ae61341a2ee0e60, type: 3}
+  - {fileID: 919132149155446097, guid: 4ed48914c05504b428c64e747892f133, type: 3}
+  - {fileID: 919132149155446097, guid: b1af2fff03ca446409bc1edaf3644fb6, type: 3}
   modelImgs: []
   modelOffsets:
   - {x: 0, y: 0.184, z: 0}
   - {x: 0, y: 0.18, z: 0}
   - {x: 0, y: -0.38, z: -0.547}
+  - {x: 0, y: 0.104, z: 0}
+  - {x: 0, y: 0.319, z: 0}
   modelRots: []
   defaultColors: []
   mats:

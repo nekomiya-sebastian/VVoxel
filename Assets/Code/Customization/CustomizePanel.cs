@@ -96,8 +96,15 @@ public class CustomizePanel
 
 		if( curModel != null )
 		{
-			curModelDefaultOffset = curModel.transform.localPosition;
-			curModelDefaultRot = curModel.transform.localEulerAngles;
+			// curModelDefaultOffset = curModel.transform.localPosition;
+			// curModelDefaultRot = curModel.transform.localEulerAngles;
+			if( !initDefaultOffsets.ContainsKey( gameObject.name ) )
+			{
+				initDefaultOffsets[gameObject.name] = curModel.transform.localPosition;
+				initDefaultRots[gameObject.name] = curModel.transform.localEulerAngles;
+			}
+			curModelDefaultOffset = initDefaultOffsets[gameObject.name];
+			curModelDefaultRot = initDefaultRots[gameObject.name];
 		}
 
 		// maintain scroll position from prev panel
@@ -131,12 +138,12 @@ public class CustomizePanel
 
 	public void ReplaceModel( int index,
 		Vector3 offset,Vector3 rot,
-		GameObject newCharModel = null,bool setDefaults = false )
+		GameObject newCharModel = null,bool setDefaults = false,bool addMesh = true )
 	{
 		// -1 = unset, models.Count = manually selected none
 		bool invalidIndex = ( index < 0 || index == models.Count );
 
-		if( charModel == null ) charModel = newCharModel;
+		if( newCharModel != null ) SetCharModel( newCharModel );
 
 		Transform curTarget = FindCurTarget();
 		var targetModel = FindTargetModel( curTarget );
@@ -153,7 +160,7 @@ public class CustomizePanel
 		newModel.transform.SetParent( curTarget,false );
 		newModel.transform.localPosition = offset;
 		newModel.transform.localRotation = Quaternion.Euler( rot );
-		if( newModel.transform.childCount > 0 )
+		if( newModel.transform.childCount > 0 && addMesh )
 		{
 			var meshColl = newModel.AddComponent<MeshCollider>();
 			meshColl.sharedMesh = newModel.transform.GetChild( 0 ).GetComponent<MeshFilter>().mesh;
@@ -167,9 +174,11 @@ public class CustomizePanel
 
 		if( setDefaults )
 		{
+			// var oldOffset = curModel.transform.position;
+			// var oldRot = curModel.transform.rotation;
 			curModel = newModel;
-			curModelDefaultOffset = offset;
-			curModelDefaultRot = rot;
+			// curModel.transform.localPosition = oldOffset;
+			// curModel.transform.localRotation = oldRot;
 
 			charCtrl.SetTargetPart( newModel.transform );
 		}
@@ -183,7 +192,7 @@ public class CustomizePanel
 
 	public void ReplaceModelMat( int index,GameObject newCharModel = null,bool setDefaults = false )
 	{
-		if( charModel == null ) charModel = newCharModel;
+		if( newCharModel != null ) SetCharModel( newCharModel );
 
 		Transform curTarget = FindCurTarget();
 		var targetModel = FindTargetModel( curTarget );
@@ -206,6 +215,11 @@ public class CustomizePanel
 		{
 			var prevTarget = curTarget;
 			curTarget = curTarget.Find( pivot );
+			if( curTarget == null )
+			{
+				print( pivot );
+				print( curTarget.name );
+			}
 			Assert.IsNotNull( curTarget );
 		}
 		return( curTarget );
@@ -282,6 +296,23 @@ public class CustomizePanel
 		return( pivotPath );
 	}
 
+	public void CopyInto( CustomizePanel receiver )
+	{
+		receiver.pivotPath = pivotPath;
+		receiver.title = title;
+		receiver.models.Clear();
+		foreach( var model in models ) receiver.models.Add( model );
+		receiver.modelImgs = modelImgs;
+		receiver.modelOffsets = modelOffsets;
+		receiver.modelRots = modelRots;
+		receiver.defaultColors = defaultColors;
+	}
+
+	public List<GameObject> GetModels()
+	{
+		return( models );
+	}
+
 	GameObject charModel = null;
 	PartsPanel partsPanel;
 	CustomCharCtrl charCtrl;
@@ -311,4 +342,7 @@ public class CustomizePanel
 
 	static float modelScroll = 1.0f;
 	static float colorScroll = 1.0f;
+
+	static Dictionary<string,Vector3> initDefaultOffsets = new Dictionary<string,Vector3>();
+	static Dictionary<string,Vector3> initDefaultRots = new Dictionary<string,Vector3>();
 }

@@ -674,6 +674,7 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: 313777acf56308940953c122ca052b80, type: 3}
   - {fileID: 919132149155446097, guid: 7066f1a70670fa042b503eed453e9887, type: 3}
   - {fileID: 919132149155446097, guid: 065e9d6a01d2d3b498440f720f2bac1d, type: 3}
+  - {fileID: 919132149155446097, guid: 0bf05a20883388f46b201a233e7ad6e7, type: 3}
   modelImgs: []
   modelOffsets:
   - {x: 0, y: 0, z: 0}

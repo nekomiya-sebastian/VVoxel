@@ -28,8 +28,8 @@ public class CustomCharCtrl
 			pointerData.position = Input.mousePosition;
 			var results = new List<RaycastResult>();
 			eventSys.RaycastAll( pointerData,results );
-			// foreach( var result in results ) print( result );
 			hoveringMenu = ( results.Count > 0 );
+			if( hoveringMenu && Input.GetMouseButtonDown( 0 ) ) movementBan = true;
 		}
 
 		{
@@ -40,7 +40,7 @@ public class CustomCharCtrl
 			// rotation
 			if( Input.GetMouseButton( 1 ) )
 			{
-				if( !hoveringMenu && !locked )
+				if( !movementBan && !locked )
 				{
 					if( !movePart )
 					{
@@ -66,7 +66,7 @@ public class CustomCharCtrl
 			// movement
 			if( Input.GetMouseButton( 0 ) )
 			{
-				if( !hoveringMenu && !locked )
+				if( !movementBan && !locked )
 				{
 					if( !movePart )
 					{
@@ -95,12 +95,12 @@ public class CustomCharCtrl
 			// }
 
 			// select part
-			if( !hoveringMenu && diff == Vector2.zero && Input.GetMouseButtonUp( 0 ) )
+			if( !movementBan && diff == Vector2.zero && Input.GetMouseButtonUp( 0 ) )
 			{
 				// var ray = new Ray( cam.transform.position,cam.transform.forward );
 				var ray = cam.ScreenPointToRay( Input.mousePosition );
 				RaycastHit hit;
-				if( Physics.Raycast( ray,out hit,20.0f,rayMask ) )
+				if( Physics.Raycast( ray,out hit,200.0f,rayMask ) )
 				{
 					var transStart = hit.transform;
 					while( !transStart.name.Contains( "Pivot" ) && transStart.parent != null )
@@ -135,6 +135,8 @@ public class CustomCharCtrl
 				else targetPart.localScale = scale;
 			}
 		}
+
+		if( !Input.GetMouseButton( 0 ) ) movementBan = false;
 	}
 
 	public void SetMovePart( bool move,Transform targetPart )
@@ -177,4 +179,6 @@ public class CustomCharCtrl
 	bool movePart = false;
 	Transform targetPart = null;
 	bool locked = false;
+
+	bool movementBan = false;
 }

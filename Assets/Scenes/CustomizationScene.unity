@@ -3074,7 +3074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a85685e780b2bc64d8c8aba026836430, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  charModel: {fileID: 8443577940976012396}
+  animCtrl: {fileID: 8443577940976012398}
   poseButtonPrefab: {fileID: 8646203006743158767, guid: 31b0dbf7452b6b4458d3ce7f23e1bdd7, type: 3}
 --- !u!114 &1169951176
 MonoBehaviour:
@@ -4585,7 +4585,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1271387595}
   m_HandleRect: {fileID: 1271387594}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -5499,6 +5499,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   partsPanel: {fileID: 2081082517}
   charModel: {fileID: 8443577940976012396}
+  enableHotkeys: 1
+  customPaths: []
+  customModels: []
+  loadOnStart: 1
 --- !u!1 &2081082512
 GameObject:
   m_ObjectHideFlags: 0
@@ -5621,10 +5625,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32a4db10f4e70614da1dfd40328ecac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  charCtrl: {fileID: 8343690132949945858}
   charModel: {fileID: 8443577940976012396}
   canv: {fileID: 231073136}
   movePartToggle: {fileID: 2101498552}
   partButtonPrefab: {fileID: 8646203006743158767, guid: 68efb325eac50a147bafb8baed9005cd, type: 3}
+  customizationPanelPrefab: {fileID: 2746117044499119216, guid: 760ab8127c821104d8134da6c6e2598c, type: 3}
   parts:
   - readableName: Head
     pivotName: HeadPivot
@@ -6065,5 +6071,10 @@ MonoBehaviour:
 --- !u!1 &8443577940976012396 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8443577940491055638, guid: 9afedde389d17e4418bbb731d1a15db7, type: 3}
+  m_PrefabInstance: {fileID: 494419578}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &8443577940976012398 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 3655037461228995995, guid: 9afedde389d17e4418bbb731d1a15db7, type: 3}
   m_PrefabInstance: {fileID: 494419578}
   m_PrefabAsset: {fileID: 0}
