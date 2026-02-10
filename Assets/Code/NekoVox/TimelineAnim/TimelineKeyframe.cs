@@ -9,7 +9,16 @@ public class TimelineKeyframe
 	{
 		None = -1,
 		Idle,
-		Pushup
+		Pushup,
+		ManiacalLaugh,
+		Point,
+		ScratchChin,
+		Shrug,
+		Facepalm,
+		ShootPistol,
+		Run,
+		PickUp,
+		PickUpHold
 	}
 
 	public enum TransitionType
