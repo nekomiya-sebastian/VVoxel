@@ -10,7 +10,8 @@ public class TimelineActor
 {
 	void Start()
 	{
-		animCtrl = GetComponent<Animator>();
+		var animator = GetComponent<Animator>();
+		if( animator ) animCtrl = animator;
 
 		curFrame = TimelineFrame;
 		TimelineKeyframe.AnimState finalState = TimelineKeyframe.AnimState.Idle;
@@ -33,11 +34,11 @@ public class TimelineActor
 			}
 		}
 		
-		if( finalState != TimelineKeyframe.AnimState.None ) animCtrl.SetInteger( "State",( int )finalState );
+		if( finalState != TimelineKeyframe.AnimState.None ) animCtrl?.SetInteger( "State",( int )finalState );
 		else // if( animCtrl != null )
 		{
 			// animCtrl.SetInteger( "State",( int )keyframes[curFrame - 1].anim );
-			animCtrl.SetInteger( "State",( int )lastValidState );
+			animCtrl?.SetInteger( "State",( int )lastValidState );
 			StartCoroutine( MaybeSetNoneTimer( -1 ) );
 		}
 
@@ -78,8 +79,11 @@ public class TimelineActor
 
 			if( keyframes[curFrame].anim != TimelineKeyframe.AnimState.None )
 			{
-				animCtrl.speed = 1.0f;
-				animCtrl.SetInteger( "State",( int )keyframes[curFrame].anim );
+				if( animCtrl )
+				{
+					animCtrl.speed = 1.0f;
+					animCtrl.SetInteger( "State",( int )keyframes[curFrame].anim );
+				}
 				
 				StartCoroutine( MaybeSetNoneTimer() ); // idk why we need this here
 			}
@@ -152,13 +156,18 @@ public class TimelineActor
 			keyframes[curFrame + 1 + actionOffset].anim == TimelineKeyframe.AnimState.None )
 		{
 			yield return( new WaitForSeconds( GetClipDur() ) );
-			animCtrl.speed = 0.0f;
-			animCtrl.Play( animCtrl.GetCurrentAnimatorClipInfo( 0 )[0].clip.name,0,0.99f );
+			if( animCtrl )
+			{
+				animCtrl.speed = 0.0f;
+				animCtrl.Play( animCtrl.GetCurrentAnimatorClipInfo( 0 )[0].clip.name,0,0.99f );
+			}
 		}
 	}
 
 	float GetClipDur()
 	{
+		if( !animCtrl ) return( 0.0f );
+
 		var clipInfo = animCtrl.GetCurrentAnimatorClipInfo( 0 )[0];
 		if( animCtrl.GetNextAnimatorClipInfo( 0 ).Length > 0 )
 		{
@@ -285,7 +294,7 @@ public class TimelineActor
 
 	[HideInInspector] [SerializeField] public List<TimelineKeyframe> keyframes = new List<TimelineKeyframe>();
 
-	Animator animCtrl;
+	Animator animCtrl = null;
 
 	[HideInInspector] [SerializeField] int curFrame = 0;
 	[HideInInspector] [SerializeField] bool autoRead = false;
