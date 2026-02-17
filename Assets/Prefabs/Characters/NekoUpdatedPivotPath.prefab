@@ -1119,7 +1119,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8565289293673542895}
   - component: {fileID: 8565289293673542894}
-  - component: {fileID: 8565289293673542889}
+  - component: {fileID: 1787376265422510596}
   m_Layer: 0
   m_Name: NekoUpdatedPivotPath
   m_TagString: Untagged
@@ -1164,7 +1164,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8565289293673542889
+--- !u!114 &1787376265422510596
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1178,39 +1178,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewKeyframe:
     emptyKeyframe: 0
-    anim: 0
-    targetPos: {x: 0, y: -1.16, z: 0}
-    targetRot: {x: 0, y: 180, z: 0}
+    anim: -1
+    targetPos: {x: 0, y: 0, z: 0}
+    targetRot: {x: 0, y: 0, z: 0}
     moveDur: 0
     triggerObjs: []
     transitionType: 0
   keyframes:
   - emptyKeyframe: 0
-    anim: 0
-    targetPos: {x: 0, y: -1.16, z: 0}
-    targetRot: {x: 0, y: 180, z: 0}
+    anim: -1
+    targetPos: {x: 0, y: 0, z: 0}
+    targetRot: {x: 0, y: 0, z: 0}
     moveDur: 0
-    triggerObjs: []
-    transitionType: 0
-  - emptyKeyframe: 0
-    anim: 0
-    targetPos: {x: 0, y: -1.16, z: 0}
-    targetRot: {x: 0, y: 210.26523, z: 0}
-    moveDur: 0.6
-    triggerObjs: []
-    transitionType: 0
-  - emptyKeyframe: 0
-    anim: 0
-    targetPos: {x: -0.72, y: -1.16, z: -1.23}
-    targetRot: {x: 0, y: 210.26523, z: 0}
-    moveDur: 0.6
-    triggerObjs: []
-    transitionType: 0
-  - emptyKeyframe: 0
-    anim: 1
-    targetPos: {x: -0.72, y: -1.16, z: -1.23}
-    targetRot: {x: -0, y: 177.14726, z: -0}
-    moveDur: 0.6
     triggerObjs: []
     transitionType: 0
   curFrame: 0
